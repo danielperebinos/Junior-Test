@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import status
 
-from drf_yasg.utils import swagger_auto_schema, no_body
+from drf_yasg.utils import swagger_auto_schema
 
 from apps.products.models import Product, WishList
 from apps.products.serializers import ProductSerializer, WishListSerializer, DetailWishListSerializer, NameWishListSerializer, IdProductSerializer

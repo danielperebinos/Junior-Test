@@ -20,15 +20,14 @@ class TestProductsView(TestCase):
         url = reverse('product-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = ProductSerializer(Product.objects.all().annotate(added_in_wishlist=Count('wishlist')
-    ), many=True).data
+        data = ProductSerializer(Product.objects.all().annotate(added_in_wishlist=Count('wishlist')), many=True).data
         self.assertEqual(response.data, data)
 
     def test_retrieve_product(self):
         url = reverse('product-detail', args=[1])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = ProductSerializer(Product.objects.filter(id=1).first()).data
+        data = ProductSerializer(Product.objects.all().annotate(added_in_wishlist=Count('wishlist')).filter(id=1).first()).data
         self.assertEqual(response.data, data)
 
     def test_update_product(self):
