@@ -50,13 +50,9 @@ class WishListViewSet(ModelViewSet):
     @swagger_auto_schema(request_body=IdProductSerializer)
     @action(detail=True, methods=['delete'], name='remove-product', url_path='remove-product')
     def remove_product(self, request, *args, **kwargs):
-        wishlist = self.get_object()
-        wishlist.products.remove(request.data.get('product_id'))
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(self.serializer_class(self.get_object().remove_product(request.data.get('product_id'))).data, status=status.HTTP_204_NO_CONTENT)
 
     @swagger_auto_schema(request_body=IdProductSerializer)
     @action(detail=True, methods=['post'], name='add-product', url_path='add-product')
     def add_product(self, request, *args, **kwargs):
-        wishlist = self.get_object()
-        wishlist.products.add(request.data.get('product_id'))
-        return Response(status=status.HTTP_200_OK)
+        return Response(self.serializer_class(self.get_object().add_product(request.data.get('product_id'))).data, status=status.HTTP_200_OK)

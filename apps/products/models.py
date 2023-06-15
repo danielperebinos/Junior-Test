@@ -27,3 +27,13 @@ class WishList(models.Model):
     name = models.CharField(max_length=250, null=False)
     user = models.ForeignKey('users.user', on_delete=models.CASCADE)
     products = models.ManyToManyField('products.product')
+
+    def add_product(self, product_id):
+        if get_object_or_404(Product.objects.all(), id=product_id):
+            self.products.add(product_id)
+            return self
+
+    def remove_product(self, product_id):
+        if get_object_or_404(Product.objects.all(), id=product_id):
+            self.products.remove(product_id)
+            return self
