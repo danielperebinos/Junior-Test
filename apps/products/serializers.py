@@ -6,7 +6,7 @@ from apps.users.serializers import ReadUserSerializer
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    added_in_wishlist = serializers.IntegerField(source='added_in_wishlist_by', read_only=True)
+    added_in_wishlist = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Product
