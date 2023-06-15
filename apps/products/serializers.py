@@ -21,11 +21,6 @@ class ProductSerializer(serializers.ModelSerializer):
 class IdProductSerializer(serializers.Serializer):
     product_id = serializers.IntegerField(allow_null=False)
 
-    def validate_product_id(self, id):
-        if Product.objects.filter(id=id).exists():
-            return id
-        raise ValidationError('Wrong product id!')
-
 
 class WishListSerializer(serializers.ModelSerializer):
     class Meta:

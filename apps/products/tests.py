@@ -100,7 +100,7 @@ class WishListViewSet(TestCase):
             'name': 'my test wishlist'
         }
         response = self.client.post(url, data=data)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertTrue(WishList.objects.filter(id=response.json()['id']).first().user, self.test_user)
 
     def test_delete_wishlist(self):

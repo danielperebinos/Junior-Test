@@ -44,31 +44,19 @@ class WishListViewSet(ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user.id)
 
-    @swagger_auto_schema(request_body=NameWishListSerializer)
-    @serialize_decorator(NameWishListSerializer)
-    def create(self, request, *args, **kwargs):
-        if request.valid:
-            new_wishlist = WishList.objects.create(user=request.user, name=request.valid.get('name'))
-            return Response(self.serializer_class(new_wishlist).data)
-        else:
-            raise ValidationError('Wrong input!')
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     @swagger_auto_schema(request_body=IdProductSerializer)
-    @serialize_decorator(IdProductSerializer)
     @action(detail=True, methods=['delete'], name='remove-product', url_path='remove-product')
     def remove_product(self, request, *args, **kwargs):
-        if request.valid:
-            wishlist = self.get_object()
-            wishlist.remove_product(request.valid.get('product_id'))
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        wishlist = self.get_object()
+        wishlist.products.remove(request.data.get('product_id'))
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @swagger_auto_schema(request_body=IdProductSerializer)
-    @serialize_decorator(IdProductSerializer)
     @action(detail=True, methods=['post'], name='add-product', url_path='add-product')
     def add_product(self, request, *args, **kwargs):
-        if request.valid:
-            wishlist = self.get_object()
-            wishlist.add_product(request.valid.get('product_id'))
-            return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        wishlist = self.get_object()
+        wishlist.products.add(request.data.get('product_id'))
+        return Response(status=status.HTTP_200_OK)
