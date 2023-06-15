@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -19,7 +20,8 @@ class TestProductsView(TestCase):
         url = reverse('product-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = ProductSerializer(Product.objects.all(), many=True).data
+        data = ProductSerializer(Product.objects.all().annotate(added_in_wishlist=Count('wishlist')
+    ), many=True).data
         self.assertEqual(response.data, data)
 
     def test_retrieve_product(self):
@@ -95,9 +97,12 @@ class WishListViewSet(TestCase):
 
     def test_create_wishlist(self):
         url = reverse('wishlist-list')
-        response = self.client.post(url)
+        data = {
+            'name': 'my test wishlist'
+        }
+        response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(WishList.objects.last().user, self.test_user)
+        self.assertTrue(WishList.objects.filter(id=response.json()['id']).first().user, self.test_user)
 
     def test_delete_wishlist(self):
         pk = 1
@@ -110,18 +115,18 @@ class WishListViewSet(TestCase):
         pk = 1
         url = reverse('wishlist-add-product', args=[pk])
         data = {
-            'name': '4'
+            'product_id': 1
         }
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(WishList.objects.filter(pk=1).first().products.filter(name='4').exists())
+        self.assertTrue(WishList.objects.filter(pk=1).first().products.filter(id=1).exists())
 
     def test_remove_product(self):
         pk = 1
         url = reverse('wishlist-remove-product', args=[pk])
         data = {
-            'name': '1'
+            'product_id': 2
         }
         response = self.client.delete(url, data=data)
         self.assertEqual(response.status_code, 204)
-        self.assertFalse(WishList.objects.filter(pk=1).first().products.filter(name='1').exists())
+        self.assertFalse(WishList.objects.filter(pk=1).first().products.filter(id=2).exists())

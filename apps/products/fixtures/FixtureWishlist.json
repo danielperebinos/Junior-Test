@@ -3,7 +3,7 @@
     "model": "products.wishlist",
     "pk": 1,
     "fields": {
-      "name": "mywish",
+      "name": "test wishlist 1",
       "user": 1,
       "products": [
         1,
@@ -15,7 +15,7 @@
     "model": "products.wishlist",
     "pk": 2,
     "fields": {
-      "name": "mywish",
+      "name": "test wishlist 2",
       "user": 1,
       "products": []
     }
@@ -24,7 +24,7 @@
     "model": "products.wishlist",
     "pk": 3,
     "fields": {
-      "name": "mywish",
+      "name": "test wishlist 3",
       "user": 1,
       "products": []
     }
@@ -33,7 +33,7 @@
     "model": "products.wishlist",
     "pk": 4,
     "fields": {
-      "name": "mywish",
+      "name": "test wishlist 1",
       "user": 2,
       "products": []
     }
