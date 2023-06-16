@@ -111,21 +111,21 @@ class WishListViewSet(TestCase):
         self.assertFalse(WishList.objects.filter(pk=pk).exists())
 
     def test_add_product(self):
-        pk = 1
-        url = reverse('wishlist-add-product', args=[pk])
+        url = reverse('wishlist-products-list')
         data = {
-            'product_id': 1
+            'product': 2,
+            'wishlist': 3
         }
         response = self.client.post(url, data=data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(WishList.objects.filter(pk=1).first().products.filter(id=1).exists())
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(WishList.objects.filter(pk=3).first().products.filter(id=2).exists())
 
     def test_remove_product(self):
-        pk = 1
-        url = reverse('wishlist-remove-product', args=[pk])
+        url = reverse('wishlist-products-delete')
         data = {
-            'product_id': 2
+            'product': 2,
+            'wishlist': 3
         }
         response = self.client.delete(url, data=data)
         self.assertEqual(response.status_code, 204)
-        self.assertFalse(WishList.objects.filter(pk=1).first().products.filter(id=2).exists())
+        self.assertFalse(WishList.objects.filter(pk=3).first().products.filter(id=2).exists())

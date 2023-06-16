@@ -1,22 +1,19 @@
 from django.db.models import Count
-from drf_util.decorators import serialize_decorator
-from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework import status
-
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import mixins, status
 
 from apps.products.models import Product, WishList
-from apps.products.serializers import ProductSerializer, WishListSerializer, DetailWishListSerializer, NameWishListSerializer, IdProductSerializer
+from apps.products.serializers import ProductSerializer, WishListSerializer, DetailWishListSerializer, NameWishListSerializer, WishListProductSerializer
 
 
 class ProductsViewSet(ModelViewSet):
     queryset = Product.objects.all().annotate(
         added_in_wishlist=Count('wishlist')
-    )
+    ).prefetch_related('wishlist_set')
 
     serializer_class = ProductSerializer
 
@@ -29,7 +26,7 @@ class ProductsViewSet(ModelViewSet):
 
 
 class WishListViewSet(ModelViewSet):
-    queryset = WishList.objects.all()
+    queryset = WishList.objects.all().prefetch_related('products')
     permission_classes = (IsAuthenticated,)
     serializer_class = WishListSerializer
 
@@ -47,12 +44,16 @@ class WishListViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @swagger_auto_schema(request_body=IdProductSerializer)
-    @action(detail=True, methods=['delete'], name='remove-product', url_path='remove-product')
-    def remove_product(self, request, *args, **kwargs):
-        return Response(self.serializer_class(self.get_object().remove_product(request.data.get('product_id'))).data, status=status.HTTP_204_NO_CONTENT)
 
-    @swagger_auto_schema(request_body=IdProductSerializer)
-    @action(detail=True, methods=['post'], name='add-product', url_path='add-product')
-    def add_product(self, request, *args, **kwargs):
-        return Response(self.serializer_class(self.get_object().add_product(request.data.get('product_id'))).data, status=status.HTTP_200_OK)
+class WishListProductViewSet(mixins.CreateModelMixin,GenericViewSet):
+    queryset = WishList.products.through.objects.all()
+    serializer_class = WishListProductSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(wishlist__user_id=self.request.user)
+
+    @swagger_auto_schema(request_body=WishListProductSerializer)
+    @action(detail=False, methods=['delete'], name='remove-product')
+    def delete(self, request, *args, **kwargs):
+        self.queryset.filter(product_id=request.data.get('product'), wishlist_id=request.data.get('wishlist')).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

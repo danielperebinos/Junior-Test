@@ -18,14 +18,16 @@ class ProductSerializer(serializers.ModelSerializer):
         raise ValidationError('Wrong price!')
 
 
-class IdProductSerializer(serializers.Serializer):
-    product_id = serializers.IntegerField(allow_null=False)
-
-
 class WishListSerializer(serializers.ModelSerializer):
     class Meta:
         model = WishList
         fields = ('id', 'name', 'products')
+
+
+class WishListProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WishList.products.through
+        fields = "__all__"
 
 
 class DetailWishListSerializer(WishListSerializer):
