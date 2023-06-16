@@ -50,7 +50,7 @@ class WishListProductViewSet(mixins.CreateModelMixin,GenericViewSet):
     serializer_class = WishListProductSerializer
 
     def get_queryset(self):
-        return self.queryset.filter(wishlist__user_id=self.request.user)
+        return self.queryset.filter(wishlist__user_id=self.request.user.id)
 
     @swagger_auto_schema(request_body=WishListProductSerializer)
     @action(detail=False, methods=['delete'], name='remove-product')
