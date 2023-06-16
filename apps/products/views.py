@@ -8,7 +8,8 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import mixins, status
 
 from apps.products.models import Product, WishList
-from apps.products.serializers import ProductSerializer, WishListSerializer, DetailWishListSerializer, NameWishListSerializer, WishListProductSerializer
+from apps.products.serializers import ProductSerializer, WishListSerializer, DetailWishListSerializer, \
+    NameWishListSerializer, WishListProductSerializer
 
 
 class ProductsViewSet(ModelViewSet):
@@ -45,7 +46,7 @@ class WishListViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class WishListProductViewSet(mixins.CreateModelMixin,GenericViewSet):
+class WishListProductViewSet(mixins.CreateModelMixin, GenericViewSet):
     queryset = WishList.products.through.objects.all()
     serializer_class = WishListProductSerializer
 
@@ -56,5 +57,5 @@ class WishListProductViewSet(mixins.CreateModelMixin,GenericViewSet):
     @serialize_decorator(WishListProductSerializer)
     @action(detail=False, methods=['delete'], name='remove-product')
     def delete(self, request, *args, **kwargs):
-        self.queryset.filter(product_id=request.valid.get('product'), wishlist_id=request.valid.get('wishlist')).delete()
+        self.queryset.filter(**request.valid).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
