@@ -107,7 +107,6 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
-    # "EXCEPTION_HANDLER": "apps.common.exceptions.custom_exception_handler",
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 
